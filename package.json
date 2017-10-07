@@ -1,0 +1,16 @@
+{
+  "name": "rza",
+  "version": "0.1.0",
+  "description": "```javascript const RZA = require('rza')",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "Mikeal Rogers <mikeal.rogers@gmail.com> (http://www.mikealrogers.com)",
+  "license": "Apache-2.0",
+  "devDependencies": {
+    "budo": "^10.0.4",
+    "standard": "^10.0.3"
+  }
+}
