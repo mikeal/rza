@@ -1,5 +1,7 @@
 # RZA - Create simple HTML elements
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/mikeal/rza.svg)](https://greenkeeper.io/)
+
 ```javascript
 const RZA = require('rza')
 
