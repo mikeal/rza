@@ -1,16 +1,35 @@
 {
   "name": "rza",
-  "version": "0.1.0",
-  "description": "```javascript const RZA = require('rza')",
+  "version": "0.0.0-development",
+  "description": "Create simple HTML elements",
   "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
   "keywords": [],
   "author": "Mikeal Rogers <mikeal.rogers@gmail.com> (http://www.mikealrogers.com)",
   "license": "Apache-2.0",
+  "scripts": {
+    "commit": "git-cz",
+    "test": "standard",
+    "precommit": "npm test",
+    "prepush": "npm test",
+    "commitmsg": "validate-commit-msg",
+    "semantic-release": "semantic-release pre && npm publish && semantic-release post"
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
+  },
   "devDependencies": {
     "budo": "^10.0.4",
+    "husky": "^0.14.3",
+    "semantic-release": "^8.0.3",
     "standard": "^10.0.3"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mikeal/rza.git"
+  },
+  "dependencies": {
+    "cz-conventional-changelog": "^2.0.0"
   }
 }
