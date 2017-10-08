@@ -46,7 +46,13 @@ class RZA extends HTMLElement {
       let _keys = Object.keys(_defaults)
       this._settings = Object.assign({}, _defaults)
 
+      let _initSettings = {}
+
       _keys.forEach(key => {
+        if (this[key]) {
+          _initSettings[key] = this[key]
+        }
+
         Object.defineProperty(this, key, {
           get: () => this._settings[key],
           set: value => {
@@ -74,6 +80,10 @@ class RZA extends HTMLElement {
           }
         }
       })
+
+      for (let key in _initSettings) {
+        this[key] = _initSettings[key]
+      }
 
       observer(this, attributes => {
         for (let key in attributes) {
