@@ -91,7 +91,6 @@ class RZA extends HTMLElement {
     */
     let shadowRoot = this.attachShadow({mode: 'open'})
     shadowRoot.innerHTML = this.shadow
-    this.shadowRoot = shadowRoot
   }
 
   /* Fix casing of attribute set/get */
