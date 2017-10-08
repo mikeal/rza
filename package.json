@@ -30,6 +30,7 @@
     "url": "https://github.com/mikeal/rza.git"
   },
   "dependencies": {
-    "cz-conventional-changelog": "^2.0.0"
+    "cz-conventional-changelog": "^2.0.0",
+    "validate-commit-msg": "^2.14.0"
   }
 }
