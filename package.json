@@ -21,11 +21,12 @@
   },
   "devDependencies": {
     "budo": "^10.0.4",
+    "commitizen": "^2.9.6",
+    "cz-conventional-changelog": "^2.0.0",
     "husky": "^0.14.3",
     "semantic-release": "^8.0.3",
-    "cz-conventional-changelog": "^2.0.0",
-    "validate-commit-msg": "^2.14.0",
-    "standard": "^10.0.3"
+    "standard": "^10.0.3",
+    "validate-commit-msg": "^2.14.0"
   },
   "repository": {
     "type": "git",
