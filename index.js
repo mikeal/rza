@@ -24,7 +24,7 @@ const observer = (element, onAttributes) => {
       if (!m.addedNodes.length) return
       if (!element._render || element._rendering) return
       if (m.target.tagName === 'RENDER') return
-      // TODO: More filtration, ensure no child or render triggers
+      // TODO: More filtration, ensure no child of render triggers
       element._render()
     })
   })
@@ -44,11 +44,12 @@ class RZA extends HTMLElement {
     setTimeout(() => {
       let _defaults = this.defaults || {}
       let _keys = Object.keys(_defaults)
+      let _waits = {}
       this._settings = Object.assign({}, _defaults)
 
       let _initSettings = {}
 
-      _keys.forEach(key => {
+      let bindKey = key => {
         if (this[key]) {
           _initSettings[key] = this[key]
         }
@@ -61,6 +62,12 @@ class RZA extends HTMLElement {
               if (value === 'false') value = false
             }
             this._settings[key] = value
+            if (_waits[key]) {
+              while (_waits[key].length) {
+                let [resolve] = _waits[key].shift()
+                resolve(value)
+              }
+            }
             this._render()
           }
         })
@@ -79,7 +86,9 @@ class RZA extends HTMLElement {
             this[key] = this.getAttribute(key)
           }
         }
-      })
+      }
+
+      _keys.forEach(bindKey)
 
       for (let key in _initSettings) {
         this[key] = _initSettings[key]
@@ -92,6 +101,23 @@ class RZA extends HTMLElement {
           }
         }
       })
+
+      let waitFor = key => {
+        if (!_keys.includes(key)) {
+          bindKey(key)
+          _keys.push(key)
+        }
+        if (typeof this[key] !== 'undefined') {
+          return Promise.resolve(this[key])
+        }
+        return new Promise((resolve, reject) => {
+          if (!_waits[key]) _waits[key] = []
+          _waits[key].push([resolve, reject])
+        })
+      }
+
+      this.waitFor = waitFor
+      this._settings.waitFor = waitFor
 
       this._render()
     })
