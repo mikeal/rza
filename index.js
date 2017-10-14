@@ -2,29 +2,37 @@
 
 const observer = (element, onAttributes) => {
   var observer = new MutationObserver(mutations => {
-    mutations = Array.from(mutations)
-    let attributes = Object.assign({},
-      ...mutations
-      .filter(m => m.type === 'attributes')
-      .map(m => m.attributeName)
-      .map(attr => {
-        let o = {}
+    let valid = m => {
+      if (m.target !== element) return false
+      if (!element._render || element._rendering) return false
+      if (m.target.getAttribute('slot') === 'render') return false
+      return true
+    }
 
-        o[attr] = element.getAttribute(attr)
-        return o
-      })
-    )
-    onAttributes(attributes)
+    mutations = Array.from(mutations).filter(valid)
+    if (!mutations.length) return
+
+    let attrs = mutations.filter(m => m.type === 'attributes')
+    if (attrs.length) {
+      onAttributes(Object.assign({},
+        ...attrs
+        .filter(m => m.type === 'attributes')
+        .map(m => m.attributeName)
+        .map(attr => {
+          let o = {}
+
+          o[attr] = element.getAttribute(attr)
+          return o
+        })
+      ))
+    }
 
     mutations.filter(m => m.type === 'characterData').forEach(m => {
-      if (element._render && !element._rendering) element._render()
+      element._render()
     })
 
     mutations.filter(m => m.type === 'childList').forEach(m => {
       if (!m.addedNodes.length) return
-      if (!element._render || element._rendering) return
-      if (m.target.tagName === 'RENDER') return
-      // TODO: More filtration, ensure no child or render triggers
       element._render()
     })
   })
@@ -176,7 +184,7 @@ class RZA extends HTMLElement {
       margin: 0 0 0 0;
       padding: 0 0 0 0;
     }
-    ::slotted(rza-render) {
+    ::slotted([slot="render"]) {
       margin: 0 0 0 0;
       padding: 0 0 0 0;
     }
