@@ -156,11 +156,15 @@ class RZA extends HTMLElement {
         return this._render()
       }
 
-      this.renderElement.innerHTML = ''
-      if (typeof value === 'string') {
+      if (this.renderElement === value) {
+        /* noop, user is directly manipulating the render element */
+      } else if (value instanceof HTMLElement) {
+        value.setAttribute('slot', 'render')
+        this.renderElement.parentNode.removeChild(this.renderElement)
+        this.appendChild(value)
+        this.renderElement = value
+      } else if (value === 'string') {
         this.renderElement.innerHTML = value
-      } else {
-        this.renderElement.appendChild(value)
       }
       this._rendering = false
     }, 0)

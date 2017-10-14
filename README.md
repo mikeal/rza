@@ -61,3 +61,17 @@ window.customElements.define('my-element', MyElement)
 ```
 
 See also: [markdown-element](https://github.com/mikeal/markdown-element).
+
+
+## render() function.
+
+The render function you define will be called whenever relevant state
+(settings) are altered.
+
+Returning a string will reset the innerHTML of the `<render>` element.
+
+Returning the previous element value is a `noop`, RZA assumes that because
+you are returning the prior element you have manipulated it correctly.
+
+Returning an HTML Element will append that element as a child and put
+it in the `render` slot of the shadowDOM so that it can be seen.
