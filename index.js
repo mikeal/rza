@@ -163,7 +163,7 @@ class RZA extends HTMLElement {
         this.renderElement.parentNode.removeChild(this.renderElement)
         this.appendChild(value)
         this.renderElement = value
-      } else if (value === 'string') {
+      } else if (typeof value === 'string') {
         this.renderElement.innerHTML = value
       }
       this._rendering = false
