@@ -75,3 +75,30 @@ you are returning the prior element you have manipulated it correctly.
 
 Returning an HTML Element will append that element as a child and put
 it in the `render` slot of the shadowDOM so that it can be seen.
+
+## default types.
+
+Setting an array for defaults defines those property names as settings
+but with no real defaults.
+
+This means that element attributes and properties of these names will
+be treated as settings, and alterations to them will cause re-renders.
+
+```javascript
+class MyElement extends RZA {
+  get defaults () {
+    return ['propname']
+  }
+}
+```
+
+Functions (sync and async) can be used as dynamic initializers for
+default properties.
+
+```javascript
+class MyElement extends RZA {
+  get defaults () {
+    return { prop: async () => 'example' }
+  }
+}
+```
