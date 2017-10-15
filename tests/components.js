@@ -62,4 +62,28 @@ class TestSeven extends RZA {
 }
 window.customElements.define('test-seven', TestSeven)
 
+class TestDefaultFunctions extends RZA {
+  get defaults () {
+    return {fn: () => 0, afn: async () => 0}
+  }
+  render (settings) {
+    if (!this.renderCounter) this.renderCounter = 0
+    this.renderCounter += 1
+    return `<wrap>${this.renderCounter}/${settings.fn}/${settings.afn}</wrap>`
+  }
+}
+window.customElements.define('test-eight', TestDefaultFunctions)
+
+class TestDefaultArray extends RZA {
+  get defaults () {
+    return ['test']
+  }
+  render (settings) {
+    if (!this.renderCounter) this.renderCounter = 0
+    this.renderCounter += 1
+    return `<wrap>${this.renderCounter}/${settings.test}/${this.test}</wrap>`
+  }
+}
+window.customElements.define('test-nine', TestDefaultArray)
+
 window.clean = str => str.replace(/\n/g, '').replace(/ /g, '')

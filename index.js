@@ -1,5 +1,7 @@
 /* globals MutationObserver, HTMLElement */
 
+const values = o => Object.keys(o).map(k => o[k])
+
 const observer = (element, onAttributes) => {
   var observer = new MutationObserver(mutations => {
     let valid = m => {
@@ -49,16 +51,34 @@ const observer = (element, onAttributes) => {
 class RZA extends HTMLElement {
   constructor () {
     super()
-    setTimeout(() => {
-      let _defaults = this.defaults || {}
-      let _keys = Object.keys(_defaults)
-      this._settings = Object.assign({}, _defaults)
+    setTimeout(async () => {
+      let _keys
+      let _defaults = {}
+      if (Array.isArray(this.defaults)) {
+        _keys = this.defaults
+      } else if (typeof this.defaults === 'object') {
+        _keys = Object.keys(this.defaults)
+        _defaults = this.defaults
+      } else if (!this.defaults) {
+        _keys = []
+      }
+
+      this._settings = Object.assign({}, this.defaults || {})
 
       let _initSettings = {}
+      let _defaultPromises = {}
 
       _keys.forEach(key => {
         if (this[key]) {
           _initSettings[key] = this[key]
+        } else if (!this.hasAttribute(key)) {
+          /* This is going to run initial render with
+             the default setting.
+          */
+          if (typeof this._settings[key] === 'function') {
+            this._settings[key] = this._settings[key]()
+            _defaultPromises[key] = this._settings[key]
+          }
         }
 
         Object.defineProperty(this, key, {
@@ -100,6 +120,10 @@ class RZA extends HTMLElement {
           }
         }
       })
+      await Promise.all(values(_defaultPromises))
+      for (let key in _defaultPromises) {
+        this[key] = await _defaultPromises[key]
+      }
 
       this._render()
     })

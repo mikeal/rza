@@ -39,6 +39,8 @@ test('setup', async t => {
 
 const getPage = async (t, inner) => {
   const page = await browser.newPage()
+  page.on('error', err => { throw err })
+  page.on('pageerror', msg => { throw new Error(`Page Error: ${msg}`) })
   await page.setContent(await index(inner))
   page.on('console', msg => console.log(msg.text))
   let same = (x, y) => t.same(x, y)
@@ -152,9 +154,9 @@ test('shadowDOM attribute', async t => {
   await page.close()
 })
 
-test('test re-render triggers', async t => {
+test('re-render triggers', async t => {
   t.plan(4)
-  let page = await getPage(t, `<test-seven></test-sevem>`)
+  let page = await getPage(t, `<test-seven></test-seven>`)
   await page.waitFor('test-seven render default')
   await page.evaluate(async () => {
     let expects = '<default>1</default>'
@@ -179,6 +181,74 @@ test('test re-render triggers', async t => {
     }, 100)
   })
   await page.waitFor('test-finished')
+  await page.close()
+})
+
+test('default function initializers', async t => {
+  t.plan(4)
+  let page = await getPage(t, `<test-eight></test-eight>`)
+  await page.waitFor('test-eight render')
+  await page.evaluate(async () => {
+    let expects = '<wrap>1/0/0</wrap>'
+    same(clean(document.querySelector('test-eight render').innerHTML), expects)
+    document.querySelector('test-eight').fn += 1
+    document.querySelector('test-eight').afn += 1
+    setTimeout(() => {
+      expects = '<wrap>2/1/1</wrap>'
+      same(clean(document.querySelector('test-eight render').innerHTML), expects)
+      document.body.innerHTML += '<test-next></test-next>'
+    }, 100)
+  })
+  await page.waitFor('test-next')
+  await page.close()
+  page = await getPage(t, `
+    <test-eight fn="1" afn="1" ></test-eight>
+  `)
+  await page.waitFor('test-eight')
+  await page.evaluate(async () => {
+    let expects = '<wrap>1/1/1</wrap>'
+    same(clean(document.querySelector('test-eight render').innerHTML), expects)
+    document.querySelector('test-eight').setAttribute('fn', '0')
+    document.querySelector('test-eight').setAttribute('afn', '0')
+    setTimeout(() => {
+      expects = '<wrap>2/0/0</wrap>'
+      same(clean(document.querySelector('test-eight render').innerHTML), expects)
+      document.body.innerHTML += '<test-next></test-next>'
+    }, 100)
+  })
+  await page.waitFor('test-next')
+  await page.close()
+})
+
+test('array as default properties', async t => {
+  t.plan(4)
+  let page = await getPage(t, `<test-nine></test-nine>`)
+  await page.waitFor('test-nine render')
+  await page.evaluate(async () => {
+    let expects = '<wrap>1/undefined/undefined</wrap>'
+    same(clean(document.querySelector('test-nine render').innerHTML), expects)
+    document.querySelector('test-nine').test = 'prop'
+    setTimeout(() => {
+      expects = '<wrap>2/prop/prop</wrap>'
+      same(clean(document.querySelector('test-nine render').innerHTML), expects)
+      document.body.innerHTML += '<test-next></test-next>'
+    }, 100)
+  })
+  await page.waitFor('test-next')
+  await page.close()
+  page = await getPage(t, `<test-nine test="reset"></test-nine>`)
+  await page.waitFor('test-nine render')
+  await page.evaluate(async () => {
+    let expects = '<wrap>1/reset/reset</wrap>'
+    same(clean(document.querySelector('test-nine render').innerHTML), expects)
+    document.querySelector('test-nine').test = 'prop'
+    setTimeout(() => {
+      expects = '<wrap>2/prop/prop</wrap>'
+      same(clean(document.querySelector('test-nine render').innerHTML), expects)
+      document.body.innerHTML += '<test-next></test-next>'
+    }, 100)
+  })
+  await page.waitFor('test-next')
   await page.close()
 })
 
