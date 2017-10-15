@@ -64,11 +64,12 @@ class RZA extends HTMLElement {
       }
 
       this._settings = Object.assign({}, this.defaults || {})
+      let _waits = {}
 
       let _initSettings = {}
       let _defaultPromises = {}
 
-      _keys.forEach(key => {
+      let bindKey = key => {
         if (this[key]) {
           _initSettings[key] = this[key]
         } else if (!this.hasAttribute(key)) {
@@ -89,6 +90,12 @@ class RZA extends HTMLElement {
               if (value === 'false') value = false
             }
             this._settings[key] = value
+            if (_waits[key]) {
+              while (_waits[key].length) {
+                let [resolve] = _waits[key].shift()
+                resolve(value)
+              }
+            }
             this._render()
           }
         })
@@ -107,7 +114,9 @@ class RZA extends HTMLElement {
             this[key] = this.getAttribute(key)
           }
         }
-      })
+      }
+
+      _keys.forEach(bindKey)
 
       for (let key in _initSettings) {
         this[key] = _initSettings[key]
@@ -124,6 +133,23 @@ class RZA extends HTMLElement {
       for (let key in _defaultPromises) {
         this[key] = await _defaultPromises[key]
       }
+
+      let waitFor = key => {
+        if (!_keys.includes(key)) {
+          bindKey(key)
+          _keys.push(key)
+        }
+        if (typeof this[key] !== 'undefined') {
+          return Promise.resolve(this[key])
+        }
+        return new Promise((resolve, reject) => {
+          if (!_waits[key]) _waits[key] = []
+          _waits[key].push([resolve, reject])
+        })
+      }
+
+      this.waitFor = waitFor
+      this._settings.waitFor = waitFor
 
       this._render()
     })

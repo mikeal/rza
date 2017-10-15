@@ -252,6 +252,26 @@ test('array as default properties', async t => {
   await page.close()
 })
 
+test('waitFor', async t => {
+  t.plan(2)
+  let page = await getPage(t, '<test-four></test-four>')
+  await page.waitFor('test-four render')
+  await page.evaluate(async () => {
+    let expects = '<wrap></wrap>'
+    same(clean(document.querySelector('test-four render').innerHTML), expects)
+    document.querySelector('test-four').waitFor('newprop').then(result => {
+      document.querySelector('test-four').innerHTML = `<${result}></${result}>`
+    })
+    document.querySelector('test-four').newprop = 'test-finished'
+  })
+  await page.waitFor('test-finished')
+  await page.evaluate(async () => {
+    let expects = '<wrap><test-finished></test-finished></wrap>'
+    same(clean(document.querySelector('test-four render').innerHTML), expects)
+  })
+  await page.close()
+})
+
 test('teardown', async t => {
   await browser.close()
   t.end()
