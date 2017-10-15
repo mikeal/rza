@@ -148,6 +148,15 @@ class RZA extends HTMLElement {
         })
       }
 
+      this.addSetting = (key, value) => {
+        if (!_keys.includes(key)) {
+          bindKey(key)
+          _keys.push(key)
+        }
+        if (typeof value !== 'undefined') {
+          this[key] = value
+        }
+      }
       this.waitFor = waitFor
       this._settings.waitFor = waitFor
 

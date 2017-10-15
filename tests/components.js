@@ -86,4 +86,13 @@ class TestDefaultArray extends RZA {
 }
 window.customElements.define('test-nine', TestDefaultArray)
 
+class TestAddSetting extends RZA {
+  render (settings) {
+    if (!this.renderCounter) this.renderCounter = 0
+    this.renderCounter += 1
+    return `<wrap>${this.renderCounter}/${settings.test}/${this.testtwo}</wrap>`
+  }
+}
+window.customElements.define('test-ten', TestAddSetting)
+
 window.clean = str => str.replace(/\n/g, '').replace(/ /g, '')

@@ -136,7 +136,7 @@ test('return element in render', async t => {
       let expect = '<five-tslot="render">5</five-t>'
       same(clean(document.querySelector('test-five').innerHTML), expect)
       document.body.innerHTML += '<test-finished></test-finished>'
-    }, 100)
+    }, 10)
   })
   await page.waitFor('test-finished')
 
@@ -178,7 +178,7 @@ test('re-render triggers', async t => {
       expects = '<attr-test>4</attr-test>'
       same(clean(document.querySelector('test-seven render').innerHTML), expects)
       document.body.innerHTML += '<test-finished></test-finished>'
-    }, 100)
+    }, 10)
   })
   await page.waitFor('test-finished')
   await page.close()
@@ -197,7 +197,7 @@ test('default function initializers', async t => {
       expects = '<wrap>2/1/1</wrap>'
       same(clean(document.querySelector('test-eight render').innerHTML), expects)
       document.body.innerHTML += '<test-next></test-next>'
-    }, 100)
+    }, 10)
   })
   await page.waitFor('test-next')
   await page.close()
@@ -214,7 +214,7 @@ test('default function initializers', async t => {
       expects = '<wrap>2/0/0</wrap>'
       same(clean(document.querySelector('test-eight render').innerHTML), expects)
       document.body.innerHTML += '<test-next></test-next>'
-    }, 100)
+    }, 10)
   })
   await page.waitFor('test-next')
   await page.close()
@@ -232,7 +232,7 @@ test('array as default properties', async t => {
       expects = '<wrap>2/prop/prop</wrap>'
       same(clean(document.querySelector('test-nine render').innerHTML), expects)
       document.body.innerHTML += '<test-next></test-next>'
-    }, 100)
+    }, 10)
   })
   await page.waitFor('test-next')
   await page.close()
@@ -246,7 +246,7 @@ test('array as default properties', async t => {
       expects = '<wrap>2/prop/prop</wrap>'
       same(clean(document.querySelector('test-nine render').innerHTML), expects)
       document.body.innerHTML += '<test-next></test-next>'
-    }, 100)
+    }, 10)
   })
   await page.waitFor('test-next')
   await page.close()
@@ -269,6 +269,30 @@ test('waitFor', async t => {
     let expects = '<wrap><test-finished></test-finished></wrap>'
     same(clean(document.querySelector('test-four render').innerHTML), expects)
   })
+  await page.close()
+})
+
+test('addSetting', async t => {
+  t.plan(3)
+  let page = await getPage(t, '<test-ten></test-ten>')
+  await page.waitFor('test-ten render')
+  await page.evaluate(async () => {
+    let expects = '<wrap>1/undefined/undefined</wrap>'
+    same(clean(document.querySelector('test-ten render').innerHTML), expects)
+    document.querySelector('test-ten').addSetting('test', 'pass')
+    document.querySelector('test-ten').addSetting('testtwo')
+    setTimeout(() => {
+      let expects = '<wrap>2/pass/undefined</wrap>'
+      same(clean(document.querySelector('test-ten render').innerHTML), expects)
+      document.querySelector('test-ten').testtwo = 'pass'
+      setTimeout(() => {
+        let expects = '<wrap>3/pass/pass</wrap>'
+        same(clean(document.querySelector('test-ten render').innerHTML), expects)
+        document.body.innerHTML += '<test-finished></test-finished>'
+      }, 10)
+    }, 10)
+  })
+  await page.waitFor('test-finished')
   await page.close()
 })
 
