@@ -1,4 +1,5 @@
 /* globals MutationObserver, HTMLElement */
+require('setimmediate')
 const {observed} = require('raekwon')
 
 const values = o => Object.keys(o).map(k => o[k])
@@ -52,7 +53,7 @@ const observer = (element, onAttributes) => {
 class RZA extends HTMLElement {
   constructor () {
     super()
-    setTimeout(async () => {
+    setImmediate(async () => {
       let _keys
       let _defaults = {}
       if (Array.isArray(this.defaults)) {
@@ -204,7 +205,7 @@ class RZA extends HTMLElement {
       this._rerender = true
       return
     }
-    this._timeout = setTimeout(async () => {
+    this._timeout = setImmediate(async () => {
       this._timeout = null
       this._rendering = true
 
