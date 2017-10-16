@@ -36,5 +36,8 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/mikeal/rza.git"
+  },
+  "dependencies": {
+    "raekwon": "^1.0.1"
   }
 }

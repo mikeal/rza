@@ -1,4 +1,5 @@
 /* globals MutationObserver, HTMLElement */
+const {observed} = require('raekwon')
 
 const values = o => Object.keys(o).map(k => o[k])
 
@@ -85,6 +86,9 @@ class RZA extends HTMLElement {
         Object.defineProperty(this, key, {
           get: () => this._settings[key],
           set: value => {
+            if (Array.isArray(value)) {
+              value = observed(value)
+            }
             if (typeof _defaults[key] === 'boolean') {
               if (value === 'true') value = true
               if (value === 'false') value = false
