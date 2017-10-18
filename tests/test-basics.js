@@ -19,11 +19,12 @@ test('basic', async (page, t) => {
 })
 
 test('defaults', async (page, t) => {
-  t.plan(1)
+  t.plan(2)
   await page.appendAndWait(`<test-two></test-two>`, 'test-two render')
   await page.evaluate(async () => {
     let expects = '<div>2</div>'
     t.same(clean(document.querySelector('test-two render').innerHTML), expects)
+    t.same(document.querySelector('test-two').arr, [])
   })
 })
 
@@ -70,7 +71,7 @@ test('return element in render', async (page, t) => {
   })
   await page.evaluate(async () => {
     setTimeout(() => {
-      t.same(document.querySelector('test-five').renderCounter, 3)
+      t.same(document.querySelector('test-five').renderCounter, 2)
       let expect = '<five-tslot="render">5</five-t>'
       t.same(clean(document.querySelector('test-five').innerHTML), expect)
       document.body.innerHTML += '<test-finished></test-finished>'

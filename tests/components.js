@@ -1,3 +1,4 @@
+/* globals t */
 let RZA = require('../')
 
 class TestOne extends RZA {
@@ -9,7 +10,7 @@ window.customElements.define('test-one', TestOne)
 
 class TestTwo extends RZA {
   get defaults () {
-    return {test: 2}
+    return {test: 2, arr: []}
   }
   render (settings) {
     return `<div>${settings.test}</div>`
@@ -94,5 +95,36 @@ class TestAddSetting extends RZA {
   }
 }
 window.customElements.define('test-ten', TestAddSetting)
+
+class TestBoolDefaults extends RZA {
+  get defaults () {
+    return {flipFalse: true, flipTrue: false}
+  }
+  render (settings) {
+    return null
+  }
+}
+window.customElements.define('test-bool', TestBoolDefaults)
+
+class TestRerender extends RZA {
+  get defaults () {
+    return ['test']
+  }
+  render (settings) {
+    if (this.test) {
+      t.ok(true)
+      return true
+    }
+    let p = new Promise(resolve => {
+      setTimeout(() => {
+        t.same(this.test, 'next')
+        resolve()
+      }, 0)
+    })
+    this.test = 'next'
+    return p
+  }
+}
+window.customElements.define('test-rerender', TestRerender)
 
 window.clean = str => str.replace(/\n/g, '').replace(/ /g, '')

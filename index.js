@@ -9,7 +9,6 @@ const observer = (element, onAttributes) => {
     let valid = m => {
       if (m.target !== element) return false
       if (!element._render || element._rendering) return false
-      if (m.target.getAttribute('slot') === 'render') return false
       return true
     }
 
@@ -31,12 +30,15 @@ const observer = (element, onAttributes) => {
       ))
     }
 
-    mutations.filter(m => m.type === 'characterData').forEach(m => {
-      element._render()
-    })
-
     mutations.filter(m => m.type === 'childList').forEach(m => {
-      if (!m.addedNodes.length) return
+      let nodes = Array.from(m.addedNodes).concat(Array.from(m.removedNodes))
+      nodes = nodes.filter(n => {
+        /* look at the parent of textNodes */
+        if (!n.tagName) n = n.parentNode
+        /* ignore anything in the render slot */
+        return n.getAttribute('slot') !== 'render'
+      })
+      if (!nodes.length) return
       element._render()
     })
   })
@@ -56,6 +58,7 @@ class RZA extends HTMLElement {
     setImmediate(async () => {
       let _keys
       let _defaults = {}
+      /* istanbul ignore else */
       if (Array.isArray(this.defaults)) {
         _keys = this.defaults
       } else if (typeof this.defaults === 'object') {
@@ -63,6 +66,8 @@ class RZA extends HTMLElement {
         _defaults = this.defaults
       } else if (!this.defaults) {
         _keys = []
+      } else {
+        throw new Error(`Unknown object set for defaults: ${typeof this.defaults}`)
       }
 
       this._settings = Object.assign({}, this.defaults || {})
@@ -105,15 +110,11 @@ class RZA extends HTMLElement {
           }
         })
 
-        if (typeof _defaults[key] === 'boolean') {
-          if (this.hasAttribute(key)) {
-            if (this.getAttribute(key) !== 'false' &&
-                this.getAttribute(key) !== false) {
-              this[key] = true
-            } else {
-              this[key] = false
-            }
-          }
+        if (typeof _defaults[key] === 'boolean' &&
+            this.hasAttribute(key) &&
+            typeof this.getAttribute(key) === 'undefined'
+            ) {
+          this[key] = !_defaults[key]
         } else {
           if (this.hasAttribute(key)) {
             this[key] = this.getAttribute(key)
@@ -200,11 +201,12 @@ class RZA extends HTMLElement {
        the settings change while rendering is
        taking place.
     */
-    if (this._timeout) return
+    //
     if (this._rendering) {
       this._rerender = true
       return
     }
+    if (this._timeout) return
     this._timeout = setImmediate(async () => {
       this._timeout = null
       this._rendering = true
@@ -237,6 +239,10 @@ class RZA extends HTMLElement {
         this.renderElement = value
       } else if (typeof value === 'string') {
         this.renderElement.innerHTML = value
+      } else if (!value) {
+        this.renderElement.innerHTML = ''
+      } else {
+        // noop
       }
       this._rendering = false
     }, 0)
