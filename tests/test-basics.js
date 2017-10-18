@@ -75,7 +75,7 @@ test('return element in render', async (page, t) => {
       let expect = '<five-tslot="render">5</five-t>'
       t.same(clean(document.querySelector('test-five').innerHTML), expect)
       document.body.innerHTML += '<test-finished></test-finished>'
-    }, 10)
+    }, 100)
   })
   await page.waitFor('test-finished')
 })
@@ -113,7 +113,7 @@ test('re-render triggers', async (page, t) => {
       expects = '<attr-test>4</attr-test>'
       t.same(clean(document.querySelector('test-seven render').innerHTML), expects)
       document.body.innerHTML += '<test-finished></test-finished>'
-    }, 10)
+    }, 100)
   })
   await page.waitFor('test-finished')
 })
@@ -130,7 +130,7 @@ test('default function initializers', async (page, t) => {
       expects = '<wrap>2/1/1</wrap>'
       t.same(clean(document.querySelector('test-eight render').innerHTML), expects)
       document.body.innerHTML += '<test-next></test-next>'
-    }, 10)
+    }, 100)
   })
   await page.waitFor('test-next')
 })
@@ -148,7 +148,7 @@ test('default functions but set', async (page, t) => {
       expects = '<wrap>2/0/0</wrap>'
       t.same(clean(document.querySelector('test-eight render').innerHTML), expects)
       document.body.innerHTML += '<test-next></test-next>'
-    }, 10)
+    }, 100)
   })
   await page.waitFor('test-next')
 })
@@ -164,7 +164,7 @@ test('array as default properties', async (page, t) => {
       expects = '<wrap>2/prop/prop</wrap>'
       t.same(clean(document.querySelector('test-nine render').innerHTML), expects)
       document.body.innerHTML += '<test-next></test-next>'
-    }, 10)
+    }, 100)
   })
   await page.waitFor('test-next')
 })
@@ -181,7 +181,7 @@ test('array as defaults with non-default', async (page, t) => {
       expects = '<wrap>2/prop/prop</wrap>'
       t.same(clean(document.querySelector('test-nine render').innerHTML), expects)
       document.body.innerHTML += '<test-next></test-next>'
-    }, 10)
+    }, 100)
   })
   await page.waitFor('test-next')
 })
@@ -220,8 +220,8 @@ test('addSetting', async (page, t) => {
         let expects = '<wrap>3/pass/pass</wrap>'
         t.same(clean(document.querySelector('test-ten render').innerHTML), expects)
         document.body.innerHTML += '<test-finished></test-finished>'
-      }, 10)
-    }, 10)
+      }, 100)
+    }, 100)
   })
   await page.waitFor('test-finished')
 })
