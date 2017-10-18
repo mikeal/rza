@@ -38,6 +38,7 @@
     "url": "https://github.com/mikeal/rza.git"
   },
   "dependencies": {
+    "cappadonna": "^1.1.0",
     "raekwon": "^1.1.0",
     "setimmediate": "^1.0.5"
   }
