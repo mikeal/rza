@@ -88,7 +88,6 @@ class RZA extends HTMLElement {
             _defaultPromises[key] = this._settings[key]
           }
         }
-
         Object.defineProperty(this, key, {
           get: () => this._settings[key],
           set: value => {
@@ -142,8 +141,7 @@ class RZA extends HTMLElement {
 
       let waitFor = key => {
         if (!_keys.includes(key)) {
-          bindKey(key)
-          _keys.push(key)
+          this.addSetting(key, this[key])
         }
         if (typeof this[key] !== 'undefined') {
           return Promise.resolve(this[key])
