@@ -55,6 +55,7 @@ const observer = (element, onAttributes) => {
 class RZA extends HTMLElement {
   constructor () {
     super()
+    this._afterRender = []
     setImmediate(async () => {
       let _keys
       let _defaults = {}
@@ -189,6 +190,12 @@ class RZA extends HTMLElement {
     this.shadowRoot.innerHTML = value
   }
 
+  nextRender () {
+    return new Promise((resolve, reject) => {
+      this._afterRender.push([resolve, reject])
+    })
+  }
+
   /* Internal batch renderer */
   async _render () {
     /* timeout is to defer rendering
@@ -243,6 +250,10 @@ class RZA extends HTMLElement {
         // noop
       }
       this._rendering = false
+
+      while (this._afterRender.length) {
+        this._afterRender.shift()[0](this.renderElement)
+      }
     }, 0)
   }
   get shadow () {

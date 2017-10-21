@@ -5,8 +5,10 @@ const test = cappadonna(path.join(__dirname, 'components.js'))
 
 test('skip render on slot', async (page, t) => {
   t.plan(5)
-  await page.appendAndWait(`<test-five></test-five>`, 'test-five five-t')
   await page.evaluate(async () => {
+    document.body.innerHTML += `<test-five></test-five>`
+    let el = document.querySelector('test-five')
+    await el.nextRender()
     let expects = '<five-tslot="render"></five-t>'
     t.same(clean(document.querySelector('test-five').innerHTML), expects)
     t.same(document.querySelector('test-five').renderCounter, 1)
@@ -31,19 +33,17 @@ test('skip render on slot', async (page, t) => {
 
 test('render textContent change', async (page, t) => {
   t.plan(3)
-  await page.appendAndWait(`<test-five></test-five>`, 'test-five five-t')
   await page.evaluate(async () => {
-    let expects = '<five-tslot="render"></five-t>'
-    t.same(clean(document.querySelector('test-five').innerHTML), expects)
-    t.same(document.querySelector('test-five').renderCounter, 1)
+    document.body.innerHTML += `<test-five></test-five>`
     let el = document.querySelector('test-five')
+    await el.nextRender()
+    let expects = '<five-tslot="render"></five-t>'
+    t.same(clean(el.innerHTML), expects)
+    t.same(el.renderCounter, 1)
     el.textContent = 'asdf'
-    setTimeout(() => {
-      t.same(document.querySelector('test-five').renderCounter, 2)
-      document.body.innerHTML += '<test-finished></test-finished>'
-    }, 10)
+    await el.nextRender()
+    t.same(document.querySelector('test-five').renderCounter, 2)
   })
-  await page.waitFor('test-finished')
 })
 
 test('boolean defaults', async (page, t) => {
@@ -71,45 +71,39 @@ test('set props before finished', async (page, t) => {
     el.flipTrue = true
     t.same(el.flipFalse, false)
     t.same(el.flipTrue, true)
-    setTimeout(async () => {
-      let promises = Promise.all(
-        [el.waitFor('noop'),
-          el.waitFor('noop'),
-          el.waitFor('flipTrue'),
-          el.waitFor('flipTrue')]
-      )
-      el.noop = true
-      await promises
-      el.flipTrue = [[]]
-      t.same(el.flipTrue, [[]])
-      el.flipTrue = 'false'
-      el.flipFalse = 'true'
-      t.same(el.flipFalse, true)
-      t.same(el.flipTrue, false)
+    await el.nextRender()
+    let promises = Promise.all(
+      [el.waitFor('noop'),
+        el.waitFor('noop'),
+        el.waitFor('flipTrue'),
+        el.waitFor('flipTrue')]
+    )
+    el.noop = true
+    await promises
+    el.flipTrue = [[]]
+    t.same(el.flipTrue, [[]])
+    el.flipTrue = 'false'
+    el.flipFalse = 'true'
+    t.same(el.flipFalse, true)
+    t.same(el.flipTrue, false)
 
-      /* validate that non-default props are not bound */
-      el.setAttribute('another', 'test')
-      t.same(typeof el.another, 'undefined')
+    /* validate that non-default props are not bound */
+    el.setAttribute('another', 'test')
+    t.same(typeof el.another, 'undefined')
 
-      /* add setting that already exists */
-      el.addSetting('flipTrue', true)
-      t.same(el.flipTrue, true)
-
-      document.body.innerHTML += '<test-finished></test-finished>'
-    }, 10)
+    /* add setting that already exists */
+    el.addSetting('flipTrue', true)
+    t.same(el.flipTrue, true)
   })
-  await page.waitFor('test-finished')
 })
 
 test('re-rendering', async (page, t) => {
   t.plan(2)
   await page.evaluate(async () => {
-    document.createElement('test-rerender')
-    setTimeout(async () => {
-      document.body.innerHTML += '<test-finished></test-finished>'
-    }, 100)
+    document.body.innerHTML += '<test-rerender></test-rerender>'
+    let el = document.querySelector('test-rerender')
+    await el.nextRender()
   })
-  await page.waitFor('test-finished')
 })
 
 test('set shadow', async (page, t) => {
