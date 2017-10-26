@@ -62,6 +62,7 @@ class RZA extends HTMLElement {
       /* istanbul ignore else */
       if (Array.isArray(this.defaults)) {
         _keys = this.defaults
+        _defaults = {}
       } else if (typeof this.defaults === 'object') {
         _keys = Object.keys(this.defaults)
         _defaults = this.defaults
@@ -71,7 +72,7 @@ class RZA extends HTMLElement {
         throw new Error(`Unknown object set for defaults: ${typeof this.defaults}`)
       }
 
-      this._settings = Object.assign({}, this.defaults || {})
+      this._settings = Object.assign({}, _defaults)
       let _waits = {}
 
       let _initSettings = {}

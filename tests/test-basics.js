@@ -146,7 +146,7 @@ test('default functions but set', async (page, t) => {
 })
 
 test('array as default properties', async (page, t) => {
-  t.plan(2)
+  t.plan(4)
   await page.evaluate(async () => {
     document.body.innerHTML += `<test-nine></test-nine>`
     let el = document.querySelector('test-nine')
@@ -161,7 +161,7 @@ test('array as default properties', async (page, t) => {
 })
 
 test('array as defaults with non-default', async (page, t) => {
-  t.plan(2)
+  t.plan(4)
   await page.evaluate(async () => {
     document.body.innerHTML += `<test-nine test="reset"></test-nine>`
     let el = document.querySelector('test-nine')

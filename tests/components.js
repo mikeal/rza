@@ -77,9 +77,11 @@ window.customElements.define('test-eight', TestDefaultFunctions)
 
 class TestDefaultArray extends RZA {
   get defaults () {
-    return ['test']
+    return ['test', 'test2']
   }
   render (settings) {
+    // Validate the array doesn't actually get mapped directly as defaults
+    t.same(settings['0'], undefined)
     if (!this.renderCounter) this.renderCounter = 0
     this.renderCounter += 1
     return `<wrap>${this.renderCounter}/${settings.test}/${this.test}</wrap>`
