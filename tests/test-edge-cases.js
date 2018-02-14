@@ -114,3 +114,13 @@ test('set shadow', async (page, t) => {
     t.same(el.shadowRoot.innerHTML, '<div></div>')
   })
 })
+
+test('early wait', async (page, t) => {
+  t.plan(1)
+  await page.evaluate(async () => {
+    let el = document.createElement('test-early-wait')
+    let promises = Promise.all([el.waitFor('early'), el.waitFor('early')])
+    el.early = true
+    t.same(await promises, [true, true])
+  })
+})

@@ -129,4 +129,14 @@ class TestRerender extends RZA {
 }
 window.customElements.define('test-rerender', TestRerender)
 
+class TestEarlyWait extends RZA {
+  get defaults () {
+    return ['early']
+  }
+  render (settings) {
+    return '<span>test</test>'
+  }
+}
+window.customElements.define('test-early-wait', TestEarlyWait)
+
 window.clean = str => str.replace(/\n/g, '').replace(/ /g, '')

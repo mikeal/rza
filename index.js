@@ -53,9 +53,17 @@ const observer = (element, onAttributes) => {
 }
 
 class RZA extends HTMLElement {
+  waitFor (key) {
+    return new Promise((resolve, reject) => {
+      if (!this._waits[key]) this._waits[key] = []
+      this._waits[key].push([resolve, reject])
+    })
+  }
   constructor () {
     super()
     this._afterRender = []
+    this._waits = {}
+
     setImmediate(async () => {
       let _keys
       let _defaults = {}
@@ -73,7 +81,6 @@ class RZA extends HTMLElement {
       }
 
       this._settings = Object.assign({}, _defaults)
-      let _waits = {}
 
       let _initSettings = {}
       let _defaultPromises = {}
@@ -101,9 +108,9 @@ class RZA extends HTMLElement {
               if (value === 'false') value = false
             }
             this._settings[key] = value
-            if (_waits[key]) {
-              while (_waits[key].length) {
-                let [resolve] = _waits[key].shift()
+            if (this._waits[key]) {
+              while (this._waits[key].length) {
+                let [resolve] = this._waits[key].shift()
                 resolve(value)
               }
             }
@@ -149,8 +156,8 @@ class RZA extends HTMLElement {
           return Promise.resolve(this[key])
         }
         return new Promise((resolve, reject) => {
-          if (!_waits[key]) _waits[key] = []
-          _waits[key].push([resolve, reject])
+          if (!this._waits[key]) this._waits[key] = []
+          this._waits[key].push([resolve, reject])
         })
       }
 
